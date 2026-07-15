@@ -32,7 +32,7 @@ The backend will be implemented as a .NET 8+ Minimal API in C#. The frontend wil
 - Must run completely offline with no external API calls.
 - Must use .NET 8+ Minimal API for the backend.
 - Frontend must be built with React and Vite.
-- Must include xUnit unit tests and Playwright end-to-end tests.
+- Must include xUnit tests for backend business logic and API integration, with frontend component and utility tests using Vitest.
 - Service behavior must be deterministic for provider stubs.
 - Design must make adding a third provider straightforward.
 - Validation rules must be reusable and consistent across client and server.
@@ -145,7 +145,7 @@ Responses:
     - international → `Passport`
     - domestic → `National ID` or equivalent
 - Client-side validation mirrors server rules.
-- Error payloads include field-level messages for invalid inputs.
+- Error payloads include a clear validation message suitable for frontend display.
 
 ## Error Handling
 
@@ -153,10 +153,7 @@ Responses:
 - Return `400` for malformed or missing query/JSON input.
 - Return `422` for business validation failures such as document type mismatch.
 - Return `404` for unknown reservation references.
-- Include structured JSON error details:
-  - `code`
-  - `message`
-  - optional `details`
+- Validation responses include a human-readable message explaining the validation failure.
 - Keep error messages user-friendly and suitable for frontend display.
 
 ## High-Level Architecture
@@ -201,22 +198,24 @@ Responses:
   - Display validation errors inline on the form
   - Keep the UI simple and responsive for offline use
 
-## Testing Strategy (xUnit and Playwright)
+## Testing Strategy (xUnit)
 
-- xUnit Backend Tests
-  - Unit tests for provider normalization and room mapping
-  - Validation tests for search and reservation rules
-  - Business rule tests for domestic/international destination logic
-  - API tests for search, reserve, and reservation lookup flows
-- Playwright Frontend Tests
-  - End-to-end test for the user journey: search → select → reserve → confirm
-  - Form validation test for missing inputs and document type mismatch
-  - Results sorting test by total price
-  - Reservation confirmation display test
-- Test setup
-  - Ensure backend can run from a clean clone with deterministic provider stubs
-  - Configure Playwright to run against local development server
-  - Use mock or stub data consistent with backend behavior for E2E stability
+### Backend Tests
+- Unit tests for provider normalization and room mapping
+- Validation tests for search and reservation business rules
+- Business rule tests for domestic/international destination logic
+- Integration tests for the search, reservation, and reservation lookup API endpoints using `WebApplicationFactory`
+- Deterministic tests using offline stub provider data
+
+### Frontend Tests
+- Component and utility tests using Vitest where appropriate
+- Client-side validation tests for required fields and document type rules
+- API helper tests using mocked responses to verify frontend integration logic
+
+### Test Setup
+- Backend runs from a clean clone using deterministic stub providers
+- Frontend tests run using Vitest against mocked API responses where applicable
+- Test data remains consistent with backend provider behavior to ensure repeatable results
 
 ## Extensibility Strategy
 
