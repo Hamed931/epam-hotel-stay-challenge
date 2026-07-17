@@ -70,6 +70,18 @@ function SearchResultsView({
                   <dt>Cancellation policy</dt>
                   <dd>{room.cancellationPolicy}</dd>
                 </div>
+                {room.starRating != null && (
+                <div>
+                <dt>Star rating</dt>
+                <dd>{"⭐".repeat(room.starRating)} ({room.starRating}/5)</dd>
+                </div>
+               )}
+               {room.amenities?.length > 0 && (
+               <div>
+               <dt>Amenities</dt>
+              <dd>{room.amenities.join(", ")}</dd>
+              </div>
+              )}
               </dl>
 
               <button
