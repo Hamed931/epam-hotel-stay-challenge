@@ -37,6 +37,80 @@ The backend will be implemented as a .NET 8+ Minimal API in C#. The frontend wil
 - Design must make adding a third provider straightforward.
 - Validation rules must be reusable and consistent across client and server.
 
+
+
+## High-Level Architecture
+
+```text
+                           +----------------------+
+                           |    React + Vite UI   |
+                           +----------+-----------+
+                                      |
+                               HTTP REST API
+                                      |
+                                      v
+                    +--------------------------------+
+                    | ASP.NET Core Minimal API        |
+                    +--------------------------------+
+                              |
+                +-------------+-------------+
+                |                           |
+                v                           v
+      HotelSearchService          ReservationService
+                |
+        +-------+-------+
+        |               |
+        v               v
+PremierStaysProvider BudgetNestsProvider
+(PascalCase JSON)   (snake_case JSON)
+        \               /
+         \             /
+          +-------------+
+          | Normalization|
+          +-------------+
+                |
+                v
+       Unified HotelRoomOption
+```
+
+## End-to-End System Flow
+
+```text
+USER
+ │
+ ▼
+React + Vite Frontend
+ │
+ ▼
+GET /hotels/search or POST /hotels/reserve
+ │
+ ▼
+ASP.NET Core Minimal API
+ │
+ ├──────────────► HotelSearchService
+ │                    │
+ │          Query both providers
+ │                    │
+ │          Normalize responses
+ │                    │
+ │          Filter & Sort
+ │                    │
+ │          Return hotel options
+ │
+ └──────────────► ReservationService
+                      │
+             Validate request
+                      │
+             Apply business rules
+                      │
+             Store reservation
+                      │
+             Return confirmation
+ │
+ ▼
+React displays results or confirmation
+```
+
 ## Domain Model
 
 - `DestinationType` enum: `Domestic`, `International`.
